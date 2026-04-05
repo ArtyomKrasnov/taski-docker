@@ -8,6 +8,7 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:13.10
@@ -17,26 +18,36 @@ jobs:
           POSTGRES_DB: django_db
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: >
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
+      # Копируем код проекта
       - uses: actions/checkout@v3
 
+      # Устанавливаем Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y python3-setuptools
-
-      - name: Install Python dependencies
+      # Апгрейд pip, setuptools и wheel
+      - name: Upgrade pip, setuptools, wheel
         run: |
+          python -m ensurepip --upgrade
           python -m pip install --upgrade pip setuptools wheel
+
+      # Устанавливаем flake8, flake8-isort и зависимости проекта
+      - name: Install dependencies
+        run: |
           pip install flake8==6.0.0 flake8-isort==6.0.0
           pip install -r ./backend/requirements.txt
 
-      - name: Test with flake8 and Django tests
+      # Запуск flake8 и django-тестов
+      - name: Run flake8 and Django tests
         env:
           POSTGRES_USER: django_user
           POSTGRES_PASSWORD: django_password
