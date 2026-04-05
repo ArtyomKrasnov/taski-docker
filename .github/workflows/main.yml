@@ -25,28 +25,26 @@ jobs:
           --health-retries 5
 
     steps:
-      # Копируем код проекта
       - uses: actions/checkout@v3
 
-      # Устанавливаем Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
-      # Апгрейд pip, setuptools и wheel
+      # Гарантируем наличие pkg_resources
       - name: Upgrade pip, setuptools, wheel
         run: |
           python -m ensurepip --upgrade
-          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip
+          pip install --upgrade setuptools wheel
 
-      # Устанавливаем flake8, flake8-isort и зависимости проекта
+      # Устанавливаем flake8 и зависимости проекта
       - name: Install dependencies
         run: |
           pip install flake8==6.0.0 flake8-isort==6.0.0
           pip install -r ./backend/requirements.txt
 
-      # Запуск flake8 и django-тестов
       - name: Run flake8 and Django tests
         env:
           POSTGRES_USER: django_user
