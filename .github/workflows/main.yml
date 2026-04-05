@@ -20,13 +20,15 @@ jobs:
         with:
           python-version: 3.12
 
-      # Обновляем pip, setuptools и wheel
-      - name: Upgrade pip, setuptools, wheel
-        run: python -m pip install --upgrade pip setuptools wheel
+      # Обновляем pip, setuptools и wheel через python -m ensurepip
+      - name: Ensure pip and setuptools
+        run: |
+          python -m ensurepip --upgrade
+          python -m pip install --upgrade pip setuptools wheel
 
       # Устанавливаем flake8 и flake8-isort
       - name: Install flake8 and plugins
-        run: pip install flake8==6.0.0 flake8-isort==6.0.0
+        run: pip install flake8 flake8-isort
 
       # Запускаем flake8
       - name: Run flake8
