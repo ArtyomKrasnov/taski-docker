@@ -32,20 +32,17 @@ jobs:
         with:
           python-version: 3.12
 
-      # Гарантируем наличие pkg_resources
-      - name: Upgrade pip, setuptools, wheel
+      - name: Ensure pip, setuptools, wheel
         run: |
           python -m ensurepip --upgrade
-          python -m pip install --upgrade pip
-          pip install --upgrade setuptools wheel
+          python -m pip install --upgrade pip setuptools wheel
 
-      # Устанавливаем flake8 и зависимости проекта
       - name: Install dependencies
         run: |
-          pip install flake8==6.0.0 flake8-isort==6.0.0
+          pip install flake8==6.0.0 isort==6.0.0
           pip install -r ./backend/requirements.txt
 
-      - name: Run flake8 and Django tests
+      - name: Run linters and Django tests
         env:
           POSTGRES_USER: django_user
           POSTGRES_PASSWORD: django_password
@@ -53,6 +50,9 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
         run: |
+          # Проверяем порядок импортов через isort
+          python -m isort --check-only backend/
+          # Flake8 без плагина isort
           python -m flake8 backend/
           cd backend/
           python manage.py test
